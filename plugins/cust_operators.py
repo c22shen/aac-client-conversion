@@ -35,12 +35,30 @@ class MyFirstSensor(BaseSensorOperator):
         if current_minute % 3 != 0:
             log.info("Current minute (%s) not is divisible by 3, sensor will retry.", current_minute)
             return False
-
+        log.info("execution time is %s",  context.get("execution_date"))
         log.info("Current minute (%s) is divisible by 3, sensor finishing.", current_minute)
         task_instance = context['task_instance']
         task_instance.xcom_push('sensors_minute', current_minute)
         return True
 
+# class MySFTPSensor(BaseSensorOperator):
+
+#     @apply_defaults
+#     def __init__(self, remote_file_path, *args, **kwargs):
+#         self.remote_file_path = remote_file_path
+#         super(MySFTPSensor, self).__init__(*args, **kwargs)
+
+#     def poke(self, context):
+#         current_minute = datetime.now().minute
+#         if current_minute % 3 != 0:
+#             log.info("Current minute (%s) not is divisible by 3, sensor will retry.", current_minute)
+#             return False
+
+#         log.info("Current minute (%s) is divisible by 3, sensor finishing.", current_minute)
+#         log.info("execution time is %s",  kwargs['execution_date'])
+#         task_instance = context['task_instance']
+#         task_instance.xcom_push('sensors_minute', current_minute)
+#         return True
 
 
 class MyFirstPlugin(AirflowPlugin):
