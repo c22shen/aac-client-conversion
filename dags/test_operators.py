@@ -4,10 +4,16 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators import MyFirstOperator, MyFirstSensor
 from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
+from airflow.utils.dates import days_ago
+
+args= {
+    'owner': 'CPOC',
+    'start_date': days_ago(1),
+    'depends_on_past': False,
+}
 
 dag = DAG('my_test_dag', description='Another tutorial DAG',
-          schedule_interval='0 12 * * *',
-          start_date=datetime(2017, 3, 20), catchup=False)
+          schedule_interval='0 12 * * *', catchup=False, default_args = args)
 
 # gcp_sftp_check= SFTPSensor(task_id='ftp_sensor_task', path='/xiao.txt', sftp_conn_id='COOP_SFTP_PROD')
 
