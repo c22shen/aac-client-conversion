@@ -1,4 +1,5 @@
 import logging
+import pendulum
 
 from airflow.models import BaseOperator
 from airflow.plugins_manager import AirflowPlugin
@@ -32,10 +33,17 @@ class MyFirstSensor(BaseSensorOperator):
 
     def poke(self, context):
         current_minute = datetime.now().minute
+        execute_date = context.get('execution_date')
+
+        log.info("Execution date is: (%s)", execute_date)
         if current_minute % 3 != 0:
             log.info("Current minute (%s) not is divisible by 3, sensor will retry.", current_minute)
             return False
-        log.info("execution time is %s",  context.get("execution_date"))
+        local_est_tz = pendulum.timezone("America/Toronto")
+        execution_date = context.get('execution_date')
+        start_date = context.get('start_date')
+        execution_date_est = local_est_tz.convert(execution_date)
+        log.info("execution time est is %s",  execution_date_est)
         log.info("Current minute (%s) is divisible by 3, sensor finishing.", current_minute)
         task_instance = context['task_instance']
         task_instance.xcom_push('sensors_minute', current_minute)
