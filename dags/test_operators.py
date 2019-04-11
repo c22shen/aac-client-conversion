@@ -40,5 +40,5 @@ sftp_sensor_file = SFTPSensor(task_id='sftp_sensor', sftp_conn_id='COOP_SFTP_PRO
 # dummy_task >> put_test_file >> sftp_sensor_file >> sensor_task >>  operator_task 
 # dummy_task >> ftp_get_file_sensor_task >> sensor_task >>  operator_task 
 
-dummy_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task])
+dummy_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task])
 
