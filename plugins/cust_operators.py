@@ -106,13 +106,13 @@ class FTPGetFileSensor(BaseSensorOperator):
                                    .format(input_transfer_msg, str(e)))
             return False
 
-def _construct_input_file_name(extractFileType, ExtractOrEmail, currentExecutionDate):
+def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDate):
     extract_or_email_file_string = None
 
-    if ExtractOrEmail == ExtractOrEmail.EMAIL:
+    if file_type == ExtractOrEmail.EMAIL:
        extract_or_email_file_string='.AlternativeEmail'
 
-    return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + extractFileType + extract_or_email_file_string + '.csv'
+    return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + file_urgency_level + extract_or_email_file_string + '.csv'
 
 class MyFirstPlugin(AirflowPlugin):
     name = "my_first_plugin"
