@@ -10,5 +10,5 @@ def print_hello():
 dag=DAG('put_sftp', description='put SFTP', schedule_interval='0 7 * * 1-5', start_date=datetime(2017,3,20), catchup = False)
 dummy_operator = DummyOperator(task_id='dummy_task', dag=dag)
 hello_operator = PythonOperator(task_id='hello_task', python_callable=print_hello, dag=dag)
-put_test_file = SFTPOperator(task_id='test_sftp', ssh_conn_id='GCP_SFTP', local_filepath='./blockspring-results.csv', remote_filepath='/home/xshn/blockspring-resultsput.csv', operation='PUT', dag=dag)
+put_test_file = SFTPOperator(task_id='test_sftp', ssh_conn_id='COOP_SFTP_PROD', local_filepath='./staging/xiao.txt', remote_filepath='/xiao.txt', operation='PUT', create_intermediate_dirs=True, dag=dag)
 dummy_operator >> hello_operator >> put_test_file
