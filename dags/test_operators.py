@@ -30,9 +30,13 @@ sensor_task = MyFirstSensor(task_id='my_sensor_task', poke_interval=30, dag=dag)
 operator_task = MyFirstOperator(my_operator_param='This is a test.',
                                 task_id='my_first_operator_task', dag=dag, execution_timeout=timedelta(minutes=30))
 
-ftp_get_regular_file_sensor_task = FTPGetFileSensor(task_id='get_regular_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='regular', poke_interval=30, dag=dag)
+ftp_get_regular_file_sensor_task = FTPGetFileSensor(task_id='get_regular_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='regular', extract_or_email='extract', poke_interval=30, dag=dag)
 
-ftp_get_urgent_file_sensor_task = FTPGetFileSensor(task_id='get_urgent_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='urgent', poke_interval=30, dag=dag)
+ftp_get_urgent_file_sensor_task = FTPGetFileSensor(task_id='get_urgent_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='urgent', extract_or_email='extract', poke_interval=30, dag=dag)
+
+ftp_get_regular_email_sensor_task = FTPGetFileSensor(task_id='get_regular_email_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='regular', extract_or_email='email', poke_interval=30, dag=dag)
+
+ftp_get_urgent_email_sensor_task = FTPGetFileSensor(task_id='get_urgent_email_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='urgent', extract_or_email='email', poke_interval=30, dag=dag)
 
 # sftp_test_file=SFTPOperator(task_id='test_sftp', ssh_conn_id='COOP_SFTP_PROD', local_filepath='./xiaoreceive.txt', remote_file_path='/xiao.txt', operation='GET', create_intermediate_dirs=True, dag=dag)
 put_test_file = SFTPOperator(task_id='test_sftp', ssh_conn_id='COOP_SFTP_PROD', local_filepath='./xiao3.txt', remote_filepath='/xiao.txt', operation='GET', dag=dag)
@@ -40,5 +44,5 @@ sftp_sensor_file = SFTPSensor(task_id='sftp_sensor', sftp_conn_id='COOP_SFTP_PRO
 # dummy_task >> put_test_file >> sftp_sensor_file >> sensor_task >>  operator_task 
 # dummy_task >> ftp_get_file_sensor_task >> sensor_task >>  operator_task 
 
-dummy_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task])
+dummy_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task, ftp_get_regular_email_sensor_task, ftp_get_urgent_email_sensor_task])
 
