@@ -49,11 +49,11 @@ class MyFirstSensor(BaseSensorOperator):
         return True
 
 class UrgentOrRegular(object):
-    REGULAR='regular'
+    REGULAR= 'regular'
     URGENT = 'urgent'
 
 class ExtractOrEmail(object):
-    EMAIL='emaill'
+    EMAIL= 'email'
     EXTRACT = 'extract'
 
 class FTPGetFileSensor(BaseSensorOperator):
