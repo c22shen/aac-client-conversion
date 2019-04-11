@@ -80,7 +80,7 @@ class FTPGetFileSensor(BaseSensorOperator):
         try: 
             self.log.info("Trying ssh_conn_id to create SSHHook.")
             self.ssh_hook = SSHHook(ssh_conn_id=self.ssh_conn_id)           
-            local_filepath = './staging/' + extract_file_name
+            local_filepath = './' + extract_file_name
             remote_filepath = '/' + extract_file_name
             
             with self.ssh_hook.get_conn() as ssh_client:
