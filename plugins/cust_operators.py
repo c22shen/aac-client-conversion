@@ -48,26 +48,26 @@ class MyFirstSensor(BaseSensorOperator):
         task_instance.xcom_push('sensors_minute', current_minute)
         return True
 
-class FileType(object):
+class UrgentOrRegular(object):
     REGULAR='regular'
     URGENT = 'urgent'
 
 class ExtractOrEmail(object):
-    EMAIL='.AlternativeEmail'
-    EXTRACT = None
+    EMAIL='emaill'
+    EXTRACT = 'extract'
 
 class FTPGetFileSensor(BaseSensorOperator):
 
     @apply_defaults
     def __init__(self, 
                 ssh_conn_id=None,
-                file_type=FileType.REGULAR,
+                regular_or_urgent=UrgentOrRegular.REGULAR,
                 extract_or_email=ExtractOrEmail.EXTRACT,
                 *args, 
                 **kwargs):
         super(FTPGetFileSensor, self).__init__(*args, **kwargs)
         self.ssh_conn_id = ssh_conn_id
-        self.file_type= file_type
+        self.regular_or_urgent= regular_or_urgent
         self.extract_or_email = extract_or_email
     
     def poke(self, context):
@@ -81,7 +81,7 @@ class FTPGetFileSensor(BaseSensorOperator):
         self.log.info("Today's date eastern should be: (%s)", current_execution_date_est)
         self.log.info("Today's date eastern in proper format should be: (%s)", current_execution_date_est.strftime("%Y%m%d"))
 
-        input_file_name = _construct_input_file_name(self.file_type, self.extract_or_email, current_execution_date_est.strftime("%Y%m%d"))
+        input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, current_execution_date_est.strftime("%Y%m%d"))
         
         self.log.info("input file name is: (%s)", input_file_name)
         try: 
@@ -98,7 +98,7 @@ class FTPGetFileSensor(BaseSensorOperator):
                 sftp_client.get(remote_filepath, local_filepath)
 
                 task_instance = context['task_instance']
-                task_instance.xcom_push(self.file_type + '_' + self.extract_or_email +'_file_name', input_file_name)
+                task_instance.xcom_push(self.regular_or_urgent + '_' + self.extract_or_email +'_file_name', input_file_name)
 
                 return True
         except Exception as e: 
@@ -107,7 +107,12 @@ class FTPGetFileSensor(BaseSensorOperator):
             return False
 
 def _construct_input_file_name(extractFileType, ExtractOrEmail, currentExecutionDate):
-    return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + extractFileType + ExtractOrEmail + '.csv'
+    extract_or_email_file_string = None
+
+    if ExtractOrEmail == ExtractOrEmail.EMAIL:
+       extract_or_email_file_string='.AlternativeEmail'
+
+    return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + extractFileType + extract_or_email_file_string + '.csv'
 
 class MyFirstPlugin(AirflowPlugin):
     name = "my_first_plugin"
