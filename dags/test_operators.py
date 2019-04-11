@@ -13,11 +13,12 @@ args= {
     'email': ['xiaoshen2009@gmail.com', 'xiao_shen@cooperators.ca'],
     'email_on_failure': True,
     'email_on_retry': True,
+    'email_on_success': True,
     'retries': 3,
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('my_test_dag', description='Another tutorial DAG', email_on_success=True,
+dag = DAG('my_test_dag', description='Another tutorial DAG',
           schedule_interval='0 7 * * 1-5', start_date=days_ago(1), catchup=False, default_args = args)
 
 # gcp_sftp_check= SFTPSensor(task_id='ftp_sensor_task', path='/xiao.txt', sftp_conn_id='COOP_SFTP_PROD')
