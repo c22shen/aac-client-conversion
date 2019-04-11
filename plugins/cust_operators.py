@@ -107,7 +107,7 @@ class FTPGetFileSensor(BaseSensorOperator):
             return False
 
 def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDate):
-    extract_or_email_file_string = None
+    extract_or_email_file_string = ''
 
     if file_type == ExtractOrEmail.EMAIL:
        extract_or_email_file_string='.AlternativeEmail'
