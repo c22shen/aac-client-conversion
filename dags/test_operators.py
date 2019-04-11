@@ -30,7 +30,7 @@ sensor_task = MyFirstSensor(task_id='my_sensor_task', poke_interval=30, dag=dag)
 operator_task = MyFirstOperator(my_operator_param='This is a test.',
                                 task_id='my_first_operator_task', dag=dag, execution_timeout=timedelta(minutes=30))
 
-ftp_get_file_sensor_task = FTPGetFileSensor(task_id='sftp_get_file_sensor', sftp_conn_id='COOP_SFTP_PROD', extract_file_type='regular')
+ftp_get_file_sensor_task = FTPGetFileSensor(task_id='sftp_get_file_sensor', ssh_conn_id='COOP_SFTP_PROD', extract_file_type='regular')
 
 # sftp_test_file=SFTPOperator(task_id='test_sftp', ssh_conn_id='COOP_SFTP_PROD', local_filepath='./xiaoreceive.txt', remote_file_path='/xiao.txt', operation='GET', create_intermediate_dirs=True, dag=dag)
 put_test_file = SFTPOperator(task_id='test_sftp', ssh_conn_id='COOP_SFTP_PROD', local_filepath='./xiao3.txt', remote_filepath='/xiao.txt', operation='GET', dag=dag)
