@@ -1,3 +1,3 @@
 FROM puckel/docker-airflow:1.10.1
-COPY requirement.txt ./
+ADD requirement.txt /
 RUN pip install -r requirement.txt --user
