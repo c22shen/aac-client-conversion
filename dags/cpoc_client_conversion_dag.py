@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import MyFirstOperator, MyFirstSensor, FTPGetFileSensor
+from airflow.operators import MyFirstOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator
 from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.utils.dates import days_ago
@@ -30,9 +30,6 @@ dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule
 
 initiation_task = DummyOperator(task_id='initiation_task', dag=dag)
 
-
-client_conversion_task = DummyOperator(task_id='client_conversion_task', dag=dag)
-
 cleanup_task = DummyOperator(task_id='cleanup_task', dag=dag)
 
 time_task = BashOperator(
@@ -48,6 +45,9 @@ ftp_get_urgent_file_sensor_task = FTPGetFileSensor(task_id='get_urgent_file_sftp
 ftp_get_regular_email_sensor_task = FTPGetFileSensor(task_id='get_regular_email_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', regular_or_urgent='regular', extract_or_email='email', poke_interval=30, dag=dag)
 
 ftp_get_urgent_email_sensor_task = FTPGetFileSensor(task_id='get_urgent_email_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', regular_or_urgent='urgent', extract_or_email='email', poke_interval=30, dag=dag)
+
+client_conversion_task = ClientConversionOperator(task_id='client_conversion_task', dag=dag)
+
 
 initiation_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task, ftp_get_regular_email_sensor_task, ftp_get_urgent_email_sensor_task])
 
