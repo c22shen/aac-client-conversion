@@ -27,7 +27,7 @@ services:
       - ./airflow.cfg:/usr/local/airflow/airflow.cfg
     ports:
       - "8080:8080"
-    command: bash -c "webserver"
+    command: webserver
     healthcheck:
       test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
       interval: 30s
