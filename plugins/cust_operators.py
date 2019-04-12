@@ -6,6 +6,7 @@ from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
 from datetime import datetime
 from airflow.operators.sensors import BaseSensorOperator
+from coseco2cifpython import python_execute
 
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,20 @@ class MyFirstOperator(BaseOperator):
         task_instance = context['task_instance']
         sensors_minute = task_instance.xcom_pull('my_sensor_task', key='sensors_minute')
         log.info('Valid minute as determined by sensor: %s', sensors_minute)
+
+class ClientConversionOperator(BaseOperator):
+
+    @apply_defaults
+    def __init__(self, *args, **kwargs):
+        super(ClientConversionOperator, self).__init__(*args, **kwargs)
+
+    def execute(self, context):
+        log.info("Client Conversion Initiation")
+        task_instance = context['task_instance']
+        # This will be dynamic later, or not make it so complicated
+        file_name = task_instance.xcom_pull('get_regular_file_sftpsensor', key='regular_extract_file_name')
+        log.info('The file name is: %s', file_name)
+        python_execute(file_name)
 
 
 class MyFirstSensor(BaseSensorOperator):
@@ -47,6 +62,7 @@ class MyFirstSensor(BaseSensorOperator):
         task_instance = context['task_instance']
         task_instance.xcom_push('sensors_minute', current_minute)
         return True
+
 
 class UrgentOrRegular(object):
     REGULAR= 'regular'
@@ -116,4 +132,4 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
 class MyFirstPlugin(AirflowPlugin):
     name = "my_first_plugin"
-    operators = [MyFirstOperator, MyFirstSensor, FTPGetFileSensor]
+    operators = [MyFirstOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator]
