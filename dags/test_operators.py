@@ -23,7 +23,12 @@ dag = DAG('my_test_dag', description='Another tutorial DAG',
 
 # gcp_sftp_check= SFTPSensor(task_id='ftp_sensor_task', path='/xiao.txt', sftp_conn_id='COOP_SFTP_PROD')
 
-dummy_task = DummyOperator(task_id='dummy_task', dag=dag)
+dummy_task = DummyOperator(task_id='initiation_task', dag=dag)
+
+
+client_conversion_task = DummyOperator(task_id='client_conversion_task', dag=dag)
+
+cleanup_task = DummyOperator(task_id='cleanup_task', dag=dag)
 
 sensor_task = MyFirstSensor(task_id='my_sensor_task', poke_interval=30, dag=dag)
 
@@ -46,3 +51,7 @@ sftp_sensor_file = SFTPSensor(task_id='sftp_sensor', sftp_conn_id='COOP_SFTP_PRO
 
 dummy_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task, ftp_get_regular_email_sensor_task, ftp_get_urgent_email_sensor_task])
 
+client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
+
+
+client_conversion_task >> cleanup_task
