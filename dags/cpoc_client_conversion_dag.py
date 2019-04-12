@@ -25,7 +25,7 @@ default_args= {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('CPOC_CLIENT_CONVERSION_DAG', description='Another tutorial DAG', schedule_interval='0 8 * * 1-5', start_date=days_ago(1), catchup=False, default_args = default_args,user_defined_filters={'localtz': localize_utc_tz,})
+dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 8 * * 1-5', start_date=days_ago(1), catchup=False, default_args = default_args,user_defined_filters={'localtz': localize_utc_tz,})
 
 
 initiation_task = DummyOperator(task_id='initiation_task', dag=dag)
@@ -54,4 +54,4 @@ initiation_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent
 client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
 
 client_conversion_task >> cleanup_task
-time_task << initiation_task
+initiation_task.set_upstream(time_task)
