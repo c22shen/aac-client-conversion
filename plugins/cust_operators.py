@@ -87,7 +87,7 @@ class FTPGetFileSensor(BaseSensorOperator):
         self.extract_or_email = extract_or_email
     
     def poke(self, context):
-        local_est_tz = pendulum.timezone("America/Toronto")
+        # local_est_tz = pendulum.timezone("America/Toronto")
         input_transfer_msg = None
         execute_date = context.get('execution_date')
         # current_execution_date = execute_date.add(days=1)
