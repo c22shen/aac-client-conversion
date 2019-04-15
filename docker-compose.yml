@@ -13,7 +13,7 @@ services:
     image: puckel/docker-airflow:1.10.1
     build:
       context: https://github.com/puckel/docker-airflow.git#1.10.1
-      dockerfile: Dockerfile1
+      dockerfile: Dockerfile
       args:
         PYTHON_DEPS: astroid==2.2.4,jellyfish==0.7.1
     restart: always
@@ -24,6 +24,7 @@ services:
       - EXECUTOR=Local
       - FERNET_KEY=jsDPRErfv8Z_eVTnGfF8ywd19j4pyqE3NpdUBA_oRTo=
     volumes:
+      - ./requirement.txt:/requirements.txt
       - ./dags:/usr/local/airflow/dags
       - ./plugins:/usr/local/airflow/plugins
       - ./airflow.cfg:/usr/local/airflow/airflow.cfg
