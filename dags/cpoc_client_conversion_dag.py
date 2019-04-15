@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import MyFirstOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator
+from airflow.operators import MyFirstSensor, FTPGetFileSensor, ClientConversionOperator
 from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.utils.dates import days_ago
