@@ -91,13 +91,13 @@ class FTPGetFileSensor(BaseSensorOperator):
         input_transfer_msg = None
         execute_date = context.get('execution_date')
         current_execution_date = execute_date.add(days=1)
-        current_execution_date_est = local_est_tz.convert(current_execution_date)
+        # current_execution_date_est = local_est_tz.convert(current_execution_date)
         self.log.info("Execution date is: (%s)", execute_date)
         self.log.info("Today's date should be: (%s)", current_execution_date)
-        self.log.info("Today's date eastern should be: (%s)", current_execution_date_est)
-        self.log.info("Today's date eastern in proper format should be: (%s)", current_execution_date_est.strftime("%Y%m%d"))
+        # self.log.info("Today's date eastern should be: (%s)", current_execution_date_est)
+        # self.log.info("Today's date eastern in proper format should be: (%s)", current_execution_date_est.strftime("%Y%m%d"))
 
-        input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, current_execution_date_est.strftime("%Y%m%d"))
+        input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, current_execution_date.strftime("%Y%m%d"))
         
         self.log.info("input file name is: (%s)", input_file_name)
         try: 
