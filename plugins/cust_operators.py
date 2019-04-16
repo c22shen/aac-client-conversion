@@ -5,7 +5,6 @@ from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
-from datetime import datetime
 from airflow.operators.sensors import BaseSensorOperator
 from coseco2cifpython import python_execute
 
@@ -141,4 +140,4 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
 class CustomPlugins(AirflowPlugin):
     name = "custom_plugin"
-    operators = [SFTPUploadOperator, FTPGetFileSensor, ClientConversionOperator]
+    operators = [FTPGetFileSensor, ClientConversionOperator, SFTPUploadOperator]
