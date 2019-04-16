@@ -139,5 +139,5 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
     return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + file_urgency_level + extract_or_email_file_string + '.csv'
 
 class CustomPlugins(AirflowPlugin):
-    name = "custom_plugin"
+    name = "cpoc_custom_plugin"
     operators = [FTPGetFileSensor, ClientConversionOperator, SFTPUploadOperator]
