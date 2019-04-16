@@ -31,7 +31,7 @@ class SFTPUploadOperator(BaseOperator):
         log.info('The generated_ouputfile list names are: %s', generated_output_files_list)
         log.info('The generated_ouputfile list names type are: %s', type(generated_output_files_list))
         
-        generated_output_files = generated_output_files_list[0]
+        generated_output_files = next((item for item in generated_output_files_list if item is not None), {})
         log.info('The generated_ouputfile names are: %s', generated_output_files)
         log.info('The generated_ouputfile names type are: %s', type(generated_output_files))
         output_transfer_msg = None
