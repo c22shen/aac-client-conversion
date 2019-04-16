@@ -48,7 +48,7 @@ class ClientConversionOperator(BaseOperator):
         log.info("Client Conversion Initiation")
         task_instance = context['task_instance']
         # This will be dynamic later, or not make it so complicated
-        file_name = task_instance.xcom_pull('client_conversion_task', key='input_extract_file')
+        file_name = task_instance.xcom_pull('get_regular_file_sftpsensor', key='input_extract_file')
         log.info('The file name is: %s', file_name)
         generated_output_files = python_execute(file_name)
         task_instance.xcom_push('generated_output_files', generated_output_files)
