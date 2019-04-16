@@ -15,13 +15,17 @@ log = logging.getLogger(__name__)
 class SFTPUploadOperator(BaseOperator):
 
     @apply_defaults
-    def __init__(self, *args, **kwargs):
+    def __init__(self, 
+                ssh_conn_id=None,
+                *args,
+                **kwargs):
         super(SFTPUploadOperator, self).__init__(*args, **kwargs)
+        self.ssh_conn_id = ssh_conn_id
 
     def execute(self, context):
         task_instance = context['task_instance']
         generated_output_files = task_instance.xcom_pull('client_conversion_task', key='generated_output_files')
-
+        output_transfer_msg = None
         try: 
             self.log.info("Trying ssh_conn_id to create SSHHook.")
             self.ssh_hook = SSHHook(ssh_conn_id=self.ssh_conn_id)                       
