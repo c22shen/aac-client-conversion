@@ -30,7 +30,7 @@ dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule
 
 regular_cleanup_task = DummyOperator(task_id='regular_cleanup_task', dag=dag)
 
-urgent_cleanup_task = DummyOperator(task_id='regular_cleanup_task', dag=dag)
+urgent_cleanup_task = DummyOperator(task_id='urgent_cleanup_task', dag=dag)
 
 regular_upload_task = SFTPUploadOperator(task_id='regular_upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
 
@@ -39,7 +39,7 @@ urgent_upload_task = SFTPUploadOperator(task_id='urgent_upload_task', ssh_conn_i
 time_task = BashOperator(
         task_id='utc_time_task',
         dag=dag,
-        bash_command='echo UTC {{ ts }}',
+        bash_command='echo UTC {{ ts }} {{ execution_date }} {{ ds }}',
 )
 
 ftp_get_regular_file_sensor_task = FTPGetFileSensor(task_id='get_regular_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', regular_or_urgent='regular', extract_or_email='extract', poke_interval=30, dag=dag)
@@ -58,10 +58,12 @@ time_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_
 
 regular_client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
 
+urgent_client_conversion_task.set_upstream([ftp_get_urgent_file_sensor_task, ftp_get_urgent_email_sensor_task])
+
 regular_client_conversion_task >> regular_upload_task >> regular_cleanup_task
 # initiation_task.set_upstream(time_task)
 
-urgent_client_conversion_task.set_upstream([ftp_get_urgent_file_sensor_task, ftp_get_urgent_email_sensor_task])
+
 
 urgent_client_conversion_task >> urgent_upload_task >> urgent_cleanup_task
 # initiation_task.set_upstream(time_task)
