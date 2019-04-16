@@ -1,3 +1,4 @@
+
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
@@ -32,7 +33,7 @@ initiation_task = DummyOperator(task_id='initiation_task', dag=dag)
 
 cleanup_task = DummyOperator(task_id='cleanup_task', dag=dag)
 
-upload_task = SFTPUploadOperator(task_id='upload_task', dag=dag)
+upload_task = SFTPUploadOperator(task_id='upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
 
 # time_task = BashOperator(
 #         task_id='task_for_testing_file_log_handler',
