@@ -24,7 +24,11 @@ class SFTPUploadOperator(BaseOperator):
 
     def execute(self, context):
         task_instance = context['task_instance']
-        generated_output_files = task_instance.xcom_pull('client_conversion_task', key='generated_output_files')
+        
+        upstream_tasks = self.get_flat_relatives(upstream=True)
+        upstream_task_ids = [task.task_id for task in upstream_tasks]
+        generated_output_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='generated_output_files')
+        generated_output_files = generated_output_files_list[0]
         output_transfer_msg = None
         try: 
             self.log.info("Trying ssh_conn_id to create SSHHook.")
@@ -51,9 +55,15 @@ class ClientConversionOperator(BaseOperator):
     def execute(self, context):
         log.info("Client Conversion Initiation")
         task_instance = context['task_instance']
+        
+        upstream_tasks = self.get_flat_relatives(upstream=True)
+        upstream_task_ids = [task.task_id for task in upstream_tasks]
+
+
         # This will be dynamic later, or not make it so complicated
-        file_name = task_instance.xcom_pull('get_regular_file_sftpsensor', key='input_extract_file')
-        log.info('The file name is: %s', file_name)
+        file_names = task_instance.xcom_pull(task_ids=upstream_task_ids, key='input_extract_file')
+        log.info('The file names are: %s', file_names)
+        file_name = file_names[0]
         generated_output_files = python_execute(file_name)
         task_instance.xcom_push('generated_output_files', generated_output_files)
 

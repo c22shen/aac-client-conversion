@@ -28,18 +28,15 @@ default_args= {
 
 dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 8 * * 1-5', start_date=days_ago(1), catchup=False, default_args = default_args)
 
-
-initiation_task = DummyOperator(task_id='initiation_task', dag=dag)
-
 cleanup_task = DummyOperator(task_id='cleanup_task', dag=dag)
 
-upload_task = SFTPUploadOperator(task_id='upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
+regular_upload_task = SFTPUploadOperator(task_id='regular_upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
 
-# time_task = BashOperator(
-#         task_id='task_for_testing_file_log_handler',
-#         dag=dag,
-#         bash_command='echo UTC {{ ts }}, Local {{ execution_date | localtz }} next {{ next_execution_date | localtz }}',
-# )
+time_task = BashOperator(
+        task_id='utc_time_task',
+        dag=dag,
+        bash_command='echo UTC {{ ts }}',
+)
 
 ftp_get_regular_file_sensor_task = FTPGetFileSensor(task_id='get_regular_file_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', regular_or_urgent='regular', extract_or_email='extract', poke_interval=30, dag=dag)
 
@@ -49,12 +46,12 @@ ftp_get_regular_email_sensor_task = FTPGetFileSensor(task_id='get_regular_email_
 
 ftp_get_urgent_email_sensor_task = FTPGetFileSensor(task_id='get_urgent_email_sftpsensor', ssh_conn_id='COOP_SFTP_PROD', regular_or_urgent='urgent', extract_or_email='email', poke_interval=30, dag=dag)
 
-client_conversion_task = ClientConversionOperator(task_id='client_conversion_task', dag=dag)
+regular_client_conversion_task = ClientConversionOperator(task_id='regular_client_conversion_task', dag=dag)
 
 
-initiation_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task, ftp_get_regular_email_sensor_task, ftp_get_urgent_email_sensor_task])
+time_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent_file_sensor_task, ftp_get_regular_email_sensor_task, ftp_get_urgent_email_sensor_task])
 
-client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
+regular_client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
 
-client_conversion_task >> upload_task >> cleanup_task
+regular_client_conversion_task >> regular_upload_task >> cleanup_task
 # initiation_task.set_upstream(time_task)
