@@ -28,7 +28,12 @@ class SFTPUploadOperator(BaseOperator):
         upstream_tasks = self.get_flat_relatives(upstream=True)
         upstream_task_ids = [task.task_id for task in upstream_tasks]
         generated_output_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='generated_output_files')
+        log.info('The generated_ouputfile list names are: %s', generated_output_files_list)
+        log.info('The generated_ouputfile list names type are: %s', type(generated_output_files_list))
+        
         generated_output_files = generated_output_files_list[0]
+        log.info('The generated_ouputfile names are: %s', generated_output_files)
+        log.info('The generated_ouputfile names type are: %s', type(generated_output_files))
         output_transfer_msg = None
         try: 
             self.log.info("Trying ssh_conn_id to create SSHHook.")
