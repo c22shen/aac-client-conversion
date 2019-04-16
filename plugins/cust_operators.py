@@ -66,9 +66,9 @@ class ClientConversionOperator(BaseOperator):
 
 
         # This will be dynamic later, or not make it so complicated
-        file_names = task_instance.xcom_pull(task_ids=upstream_task_ids, key='input_extract_file')
+        file_names = task_instance.xcom_pull(task_ids=upstream_task_ids, key='extract_input_extract_file')
         log.info('The file names are: %s', file_names)
-        file_name = file_names[0]
+        file_name =  next((item for item in file_names if item is not None), '')
         generated_output_files = python_execute(file_name)
         task_instance.xcom_push('generated_output_files', generated_output_files)
 
@@ -146,7 +146,7 @@ class FTPGetFileSensor(BaseSensorOperator):
                 sftp_client.get(remote_filepath, local_filepath)
 
                 task_instance = context['task_instance']
-                task_instance.xcom_push('input_extract_file', input_file_name)
+                task_instance.xcom_push(self.extract_or_email + '_input_extract_file', input_file_name)
 
                 return True
         except Exception as e: 
