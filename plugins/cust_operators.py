@@ -37,7 +37,7 @@ class SFTPUploadOperator(BaseOperator):
                     output_transfer_msg = "from {1} to {0}".format(remote_filepath,
                                                     local_filepath)
                     self.log.info("Starting to transfer output file  %s", output_transfer_msg)
-                    sftp_client.put(local_filepath, remote_filepath, True)
+                    sftp_client.put(local_filepath, remote_filepath, confirm=True)
         except Exception as e: 
             raise AirflowException("Error while transferring {0}, error: {1}. Retrying..."
                                    .format(output_transfer_msg, str(e)))
