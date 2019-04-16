@@ -69,6 +69,7 @@ class ClientConversionOperator(BaseOperator):
         file_names = task_instance.xcom_pull(task_ids=upstream_task_ids, key='extract_input_extract_file')
         log.info('The file names are: %s', file_names)
         file_name =  next((item for item in file_names if item is not None), '')
+         log.info('The file name is: %s', file_name)
         generated_output_files = python_execute(file_name)
         task_instance.xcom_push('generated_output_files', generated_output_files)
 

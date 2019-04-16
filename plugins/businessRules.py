@@ -318,11 +318,11 @@ def get_birth_date_from_row(source_row, result_dictionary=None):
         only_digits_check = re.compile('^(\d{8}|\d{16})$')
         if only_digits_check.search(source_value):
             try:
-                formatted_date = datetime.date.fromisoformat( format_date(source_value) )
+                formatted_date = dt.date.fromisoformat( format_date(source_value) )
             except ValueError:
                 # In this case, a day or month is out of range (example march 34th)
                 return ''
-            today = datetime.date.today()
+            today = dt.date.today()
             if formatted_date <= today:
                 return formatted_date.isoformat()
             else:
