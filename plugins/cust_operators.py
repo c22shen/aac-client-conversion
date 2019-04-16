@@ -1,6 +1,7 @@
 import logging
 import pendulum
 from airflow.contrib.hooks.ssh_hook import SSHHook
+from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
@@ -11,19 +12,31 @@ from coseco2cifpython import python_execute
 
 log = logging.getLogger(__name__)
 
-class MyFirstOperator(BaseOperator):
+class SFTPUploadOperator(BaseOperator):
 
     @apply_defaults
-    def __init__(self, my_operator_param, *args, **kwargs):
-        self.operator_param = my_operator_param
-        super(MyFirstOperator, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(SFTPUploadOperator, self).__init__(*args, **kwargs)
 
     def execute(self, context):
-        log.info("Hello World!")
-        log.info('operator_param: %s', self.operator_param)
         task_instance = context['task_instance']
-        sensors_minute = task_instance.xcom_pull('my_sensor_task', key='sensors_minute')
-        log.info('Valid minute as determined by sensor: %s', sensors_minute)
+        generated_output_files = task_instance.xcom_pull('client_conversion_task', key='generated_output_files')
+
+        try: 
+            self.log.info("Trying ssh_conn_id to create SSHHook.")
+            self.ssh_hook = SSHHook(ssh_conn_id=self.ssh_conn_id)                       
+            with self.ssh_hook.get_conn() as ssh_client:
+                sftp_client = ssh_client.open_sftp()
+                for output_file_name in generated_output_files.values(): 
+                    local_filepath = './' + output_file_name
+                    remote_filepath = '/AI_Output/' + output_file_name
+                    output_transfer_msg = "from {1} to {0}".format(remote_filepath,
+                                                    local_filepath)
+                    self.log.info("Starting to transfer output file  %s", output_transfer_msg)
+                    sftp_client.put(local_filepath, remote_filepath, True)
+        except Exception as e: 
+            raise AirflowException("Error while transferring {0}, error: {1}. Retrying..."
+                                   .format(output_transfer_msg, str(e)))
 
 class ClientConversionOperator(BaseOperator):
 
@@ -35,10 +48,10 @@ class ClientConversionOperator(BaseOperator):
         log.info("Client Conversion Initiation")
         task_instance = context['task_instance']
         # This will be dynamic later, or not make it so complicated
-        file_name = task_instance.xcom_pull('get_regular_file_sftpsensor', key='regular_extract_file_name')
+        file_name = task_instance.xcom_pull('client_conversion_task', key='input_extract_file')
         log.info('The file name is: %s', file_name)
-        python_execute(file_name)
-
+        generated_output_files = python_execute(file_name)
+        task_instance.xcom_push('generated_output_files', generated_output_files)
 
 class MyFirstSensor(BaseSensorOperator):
 
@@ -114,7 +127,7 @@ class FTPGetFileSensor(BaseSensorOperator):
                 sftp_client.get(remote_filepath, local_filepath)
 
                 task_instance = context['task_instance']
-                task_instance.xcom_push(self.regular_or_urgent + '_' + self.extract_or_email +'_file_name', input_file_name)
+                task_instance.xcom_push('input_extract_file', input_file_name)
 
                 return True
         except Exception as e: 
@@ -130,6 +143,6 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
     return 'ECMExtract.DB2Data'+ currentExecutionDate + '.' + file_urgency_level + extract_or_email_file_string + '.csv'
 
-class MyFirstPlugin(AirflowPlugin):
-    name = "my_first_plugin"
-    operators = [MyFirstOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator]
+class CustomPlugins(AirflowPlugin):
+    name = "custom_plugin"
+    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator]

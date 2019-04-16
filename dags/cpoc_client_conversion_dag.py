@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import MyFirstSensor, FTPGetFileSensor, ClientConversionOperator
+from airflow.operators import MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, SFTPUploadOperator
 from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.utils.dates import days_ago
@@ -32,6 +32,8 @@ initiation_task = DummyOperator(task_id='initiation_task', dag=dag)
 
 cleanup_task = DummyOperator(task_id='cleanup_task', dag=dag)
 
+upload_task = SFTPUploadOperator(task_id='upload_task', dag=dag)
+
 # time_task = BashOperator(
 #         task_id='task_for_testing_file_log_handler',
 #         dag=dag,
@@ -53,5 +55,5 @@ initiation_task.set_downstream([ftp_get_regular_file_sensor_task, ftp_get_urgent
 
 client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, ftp_get_regular_email_sensor_task])
 
-client_conversion_task >> cleanup_task
+client_conversion_task >> upload_task >> cleanup_task
 # initiation_task.set_upstream(time_task)

@@ -150,6 +150,20 @@ def python_execute(extract_input_file):
     #    for row in something_to_loop
     output.close()
 
+    output_files = {
+        'extract_warning': extract_warning_filename,
+        'extract_error': extract_error_filename,
+        'extract_collapsed': extract_collapsed_filename,
+        'extract_change': extract_changed_records_filename,
+        'extract_group_rpa': extract_group_rpas_filename,
+        'extract_momo_rpa': extract_group_momo_filename,
+        'party_load': party_load_output_filename,
+        'party_error': party_load_output_error_filename,
+        'party_warning': party_load_output_warning_filename
+    }
+
+    return output_files
+
 if __name__ == '__main__':
     python_execute('ECMExtract.DB2Data20190412.regular.csv')
 
