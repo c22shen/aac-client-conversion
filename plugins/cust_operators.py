@@ -73,30 +73,6 @@ class ClientConversionOperator(BaseOperator):
         generated_output_files = python_execute(file_name)
         task_instance.xcom_push('generated_output_files', generated_output_files)
 
-class MyFirstSensor(BaseSensorOperator):
-
-    @apply_defaults
-    def __init__(self, *args, **kwargs):
-        super(MyFirstSensor, self).__init__(*args, **kwargs)
-
-    def poke(self, context):
-        current_minute = datetime.now().minute
-        execute_date = context.get('execution_date')
-
-        log.info("Execution date is: (%s)", execute_date)
-        if current_minute % 3 != 0:
-            log.info("Current minute (%s) not is divisible by 3, sensor will retry.", current_minute)
-            return False
-        local_est_tz = pendulum.timezone("America/Toronto")
-        execution_date = context.get('execution_date')
-        execution_date_est = local_est_tz.convert(execution_date)
-        log.info("execution time est is %s",  execution_date_est)
-        log.info("Current minute (%s) is divisible by 3, sensor finishing.", current_minute)
-        task_instance = context['task_instance']
-        task_instance.xcom_push('sensors_minute', current_minute)
-        return True
-
-
 class UrgentOrRegular(object):
     REGULAR= 'regular'
     URGENT = 'urgent'
@@ -165,4 +141,4 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
 class CustomPlugins(AirflowPlugin):
     name = "custom_plugin"
-    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator]
+    operators = [SFTPUploadOperator, FTPGetFileSensor, ClientConversionOperator]
