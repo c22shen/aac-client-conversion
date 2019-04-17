@@ -44,7 +44,7 @@ class FilesCleaningOperator(BaseOperator):
         generated_output_files = next((item for item in generated_output_files_list if item is not None), {})
         for output_file_name in generated_output_files.values():
             self.log.info("Starting to remove local file  %s", output_file_name)
-            os.remove('/'+output_file_name)
+            os.remove('./'+output_file_name)
 
 class SFTPUploadOperator(BaseOperator):
 
