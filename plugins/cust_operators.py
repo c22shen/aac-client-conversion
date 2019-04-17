@@ -61,8 +61,7 @@ class SFTPUploadOperator(BaseOperator):
                 for output_file_name in generated_output_files.values(): 
                     local_filepath = './' + output_file_name
                     remote_filepath = '/AI_Output/' + output_file_name
-                    output_transfer_msg = "from {1} to {0}".format(remote_filepath,
-                                                    local_filepath)
+                    output_transfer_msg = "from {0} to {1}".format(local_filepath, remote_filepath)
                     self.log.info("Starting to transfer output file  %s", output_transfer_msg)
                     sftp_client.put(local_filepath, remote_filepath, confirm=True)
         except Exception as e: 

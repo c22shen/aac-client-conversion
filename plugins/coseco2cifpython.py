@@ -151,17 +151,16 @@ def python_execute(extract_input_file):
     output.close()
 
     output_files = {
-        'extract_warning': extract_warning_filename,
-        'extract_error': extract_error_filename,
-        'extract_collapsed': extract_collapsed_filename,
-        'extract_change': extract_changed_records_filename,
-        'extract_group_rpa': extract_group_rpas_filename,
-        'extract_momo_rpa': extract_group_momo_filename,
-        'party_load': party_load_output_filename,
-        'party_error': party_load_output_error_filename,
-        'party_warning': party_load_output_warning_filename
+        'extract_warning': 'ECMExtract.' + party_load_name + '.warning.csv',
+        'extract_error': 'ECMExtract.' + party_load_name + '.error.csv',
+        'extract_collapsed': 'ECMExtract.' + party_load_name + '.collapsed.csv',
+        'extract_change': 'ECMExtract.' + party_load_name + '.chg.csv',
+        'extract_group_rpa': 'ECMExtract.' + party_load_name + '.RPAgroup.csv',
+        'extract_momo_rpa': 'ECMExtract.' + party_load_name + '.RPAmomo.csv',
+        'party_load': 'PARTY.' + party_load_name + '.load.csv',
+        'party_error': 'PARTY.' + party_load_name + '.error.csv',
+        'party_warning': 'PARTY.' + party_load_name + '.warning.csv'
     }
-
     return output_files
 
 if __name__ == '__main__':
