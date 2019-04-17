@@ -98,9 +98,9 @@ class MyFirstSensor(BaseSensorOperator):
 
     def poke(self, context):
         current_minute = datetime.now().minute
-        execute_date = context.get('execution_date')
+        execution_date = context.get('execution_date')
 
-        log.info("Execution date is: (%s)", execute_date)
+        log.info("Execution date is: (%s)", execution_date)
         if current_minute % 3 != 0:
             log.info("Current minute (%s) not is divisible by 3, sensor will retry.", current_minute)
             return False
@@ -139,15 +139,20 @@ class FTPGetFileSensor(BaseSensorOperator):
     def poke(self, context):
         # local_est_tz = pendulum.timezone("America/Toronto")
         input_transfer_msg = None
-        execute_date = context.get('execution_date')
+        local_est_tz = pendulum.timezone("America/Toronto")
+        now = pendulum.now()
+        execution_date = context.get('execution_date')
+        if execution_date > now: 
+            execution_date = now
+        execution_date_est = local_est_tz.convert(execution_date)
         # current_execution_date = execute_date.add(days=1)
         # current_execution_date_est = local_est_tz.convert(current_execution_date)
-        self.log.info("Execution date is: (%s)", execute_date)
+        self.log.info("Execution date eastern is: (%s)", execution_date_est)
         # self.log.info("Today's date should be: (%s)", current_execution_date)
         # self.log.info("Today's date eastern should be: (%s)", current_execution_date_est)
         # self.log.info("Today's date eastern in proper format should be: (%s)", current_execution_date_est.strftime("%Y%m%d"))
 
-        input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, execute_date.strftime("%Y%m%d"))
+        input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, execution_date_est.strftime("%Y%m%d"))
         
         self.log.info("input file name is: (%s)", input_file_name)
         try: 
