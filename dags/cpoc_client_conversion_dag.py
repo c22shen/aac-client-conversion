@@ -58,9 +58,5 @@ regular_client_conversion_task.set_upstream([ftp_get_regular_file_sensor_task, f
 urgent_client_conversion_task.set_upstream([ftp_get_urgent_file_sensor_task, ftp_get_urgent_email_sensor_task])
 
 regular_client_conversion_task >> regular_upload_task >> regular_cleanup_task
-# initiation_task.set_upstream(time_task)
-
-
 
 urgent_client_conversion_task >> urgent_upload_task >> urgent_cleanup_task
-# initiation_task.set_upstream(time_task)

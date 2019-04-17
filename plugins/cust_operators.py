@@ -23,12 +23,17 @@ class MyFirstOperator(BaseOperator):
         local_est_tz = pendulum.timezone("America/Toronto")
         execution_date = context.get('execution_date')
         execution_date_est = local_est_tz.convert(execution_date)
+        next_execution_date = context.get('next_execution_date')
+        next_execution_date_est = local_est_tz.convert(next_execution_date)
         now = pendulum.now()
         log.info("execution_date %s", execution_date)
         log.info('execution_date_est: %s', execution_date_est)
-        log.info('now: %s', now)
-        in_the_future = execution_date > now
-        log.info('in_the_future: %s', in_the_future)
+        
+        log.info("next_execution_date %s", next_execution_date)
+        log.info('next_execution_date_est: %s', next_execution_date_est)
+        log.info('now in utc: %s', now)
+        in_the_future = next_execution_date > now
+        log.info('next_execution_date is in the future: %s', in_the_future)
 
 class FilesCleaningOperator(BaseOperator):
 
