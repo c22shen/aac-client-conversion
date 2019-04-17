@@ -1,5 +1,6 @@
 import logging
 import pendulum
+import os
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -29,6 +30,21 @@ class MyFirstOperator(BaseOperator):
         in_the_future = execution_date > now
         log.info('in_the_future: %s', in_the_future)
 
+class FilesCleaningOperator(BaseOperator):
+
+    @apply_defaults
+    def __init__(self, *args, **kwargs):
+        super(FilesCleaningOperator, self).__init__(*args, **kwargs)
+
+    def execute(self, context):
+        task_instance = context['task_instance']
+        upstream_tasks = self.get_flat_relatives(upstream=True)
+        upstream_task_ids = [task.task_id for task in upstream_tasks]
+        generated_output_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='generated_output_files')
+        generated_output_files = next((item for item in generated_output_files_list if item is not None), {})
+        for output_file_name in generated_output_files.values():
+            self.log.info("Starting to remove local file  %s", output_file_name)
+            os.remove('/'+output_file_name)
 
 class SFTPUploadOperator(BaseOperator):
 
@@ -145,11 +161,7 @@ class FTPGetFileSensor(BaseSensorOperator):
             execution_date = now
         execution_date_est = local_est_tz.convert(execution_date)
         # current_execution_date = execute_date.add(days=1)
-        # current_execution_date_est = local_est_tz.convert(current_execution_date)
         self.log.info("Execution date eastern is: (%s)", execution_date_est)
-        # self.log.info("Today's date should be: (%s)", current_execution_date)
-        # self.log.info("Today's date eastern should be: (%s)", current_execution_date_est)
-        # self.log.info("Today's date eastern in proper format should be: (%s)", current_execution_date_est.strftime("%Y%m%d"))
 
         input_file_name = _construct_input_file_name(self.regular_or_urgent, self.extract_or_email, execution_date_est.strftime("%Y%m%d"))
         
@@ -186,4 +198,4 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
 class CustomPlugins(AirflowPlugin):
     name = "custom_plugin"
-    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, MyFirstOperator]
+    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, MyFirstOperator, FilesCleaningOperator]

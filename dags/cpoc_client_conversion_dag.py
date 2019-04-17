@@ -3,14 +3,13 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, SFTPUploadOperator, MyFirstOperator
+from airflow.operators import MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, SFTPUploadOperator, MyFirstOperator, FilesCleaningOperator
 from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.utils.dates import days_ago
 
 default_args= {
     'owner': 'CPOC',
-    'start_date': days_ago(2),
     'depends_on_past': False,
     'email': ['xiaoshen2009@gmail.com', 'xiao_shen@cooperators.ca'],
     'email_on_failure': True,
@@ -20,21 +19,15 @@ default_args= {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(1), catchup=True, default_args = default_args)
+dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(5), catchup=True, default_args = default_args)
 
-regular_cleanup_task = DummyOperator(task_id='regular_cleanup_task', dag=dag)
+regular_cleanup_task = FilesCleaningOperator(task_id='regular_cleanup_task', dag=dag)
 
-urgent_cleanup_task = DummyOperator(task_id='urgent_cleanup_task', dag=dag)
+urgent_cleanup_task = FilesCleaningOperator(task_id='urgent_cleanup_task', dag=dag)
 
 regular_upload_task = SFTPUploadOperator(task_id='regular_upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
 
 urgent_upload_task = SFTPUploadOperator(task_id='urgent_upload_task', ssh_conn_id='COOP_SFTP_PROD', dag=dag)
-
-time_task = BashOperator(
-        task_id='utc_time_task',
-        dag=dag,
-        bash_command='echo UTC {{ ts }} {{ execution_date }} {{ ds }}',
-)
 
 first_task = MyFirstOperator(
     task_id='my_first_operator_task', 
