@@ -23,7 +23,7 @@ default_args= {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 8 * * 1-5', start_date=datetime(2019, 4, 10, tzinfo=local_tz), catchup=True, default_args = default_args)
+dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 8 * * *', start_date=datetime(2019, 4, 10, tzinfo=local_tz), catchup=True, default_args = default_args)
 
 print('DAG timezone is: %s', dag.timezone)
 
