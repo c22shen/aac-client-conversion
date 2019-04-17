@@ -40,11 +40,27 @@ class FilesCleaningOperator(BaseOperator):
         task_instance = context['task_instance']
         upstream_tasks = self.get_flat_relatives(upstream=True)
         upstream_task_ids = [task.task_id for task in upstream_tasks]
+        
+        # Remove output files
         generated_output_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='generated_output_files')
         generated_output_files = next((item for item in generated_output_files_list if item is not None), {})
         for output_file_name in generated_output_files.values():
             self.log.info("Starting to remove local file  %s", output_file_name)
             os.remove('./'+output_file_name)
+        
+        # Remove email files
+        input_email_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='email_input_extract_file')
+        
+        for input_email_file in input_email_files_list:
+            if isinstance(input_email_file, str):
+                os.remove('./'+output_file_name)
+
+        # Remove extract files
+        input_extract_files_list = task_instance.xcom_pull(task_ids=upstream_task_ids, key='extract_input_extract_file')
+        
+        for input_extract_file in input_extract_files_list:
+            if isinstance(input_extract_file, str):
+                os.remove('./'+output_file_name)
 
 class SFTPUploadOperator(BaseOperator):
 
