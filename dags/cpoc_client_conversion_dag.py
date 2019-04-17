@@ -20,7 +20,7 @@ default_args= {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(1), catchup=False, default_args = default_args)
+dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(1), catchup=True, default_args = default_args)
 
 regular_cleanup_task = DummyOperator(task_id='regular_cleanup_task', dag=dag)
 
