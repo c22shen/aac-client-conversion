@@ -8,6 +8,13 @@ from airflow.contrib.sensors.sftp_sensor import SFTPSensor
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.utils.dates import days_ago
 
+import pytz
+tz = pytz.timezone('America/Toronto')
+
+
+def localize_utc_tz(d):
+    return tz.fromutc(d)
+
 default_args= {
     'owner': 'CPOC',
     'depends_on_past': False,
@@ -19,7 +26,9 @@ default_args= {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(5), catchup=True, default_args = default_args)
+dag = DAG('cpoc_client_conversion', description='Another tutorial DAG', schedule_interval='0 12 * * 1-5', start_date=days_ago(5), catchup=True, default_args = default_args,     user_defined_filters={
+        'localtz': localize_utc_tz,
+    })
 
 regular_cleanup_task = FilesCleaningOperator(task_id='regular_cleanup_task', dag=dag)
 
