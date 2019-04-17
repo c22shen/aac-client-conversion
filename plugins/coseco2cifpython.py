@@ -19,6 +19,14 @@ import scrub
 import businessRules
 ''' mapping of coseco extract columns and values to a CIF party load file'''
 
+def get_regular_or_urgent(extract_input_file): 
+    regular_or_urgent_result='urgent'
+    if extract_input_file and isinstance(extract_input_file, str):
+        file_basename = os.path.splitext(os.path.basename(extract_input_file))[0]
+        if 'regular' in file_basename:
+            regular_or_urgent_result = 'regular'
+    return regular_or_urgent_result
+
 def get_party_load_name_from_input_file_name(extract_input_file, force=None):
     # given: path/to/file.name.yyyymmdd.thing.csv  gives you file.name.yyyymmdd.thing
     if extract_input_file and isinstance(extract_input_file, str):
@@ -150,17 +158,20 @@ def python_execute(extract_input_file):
     #    for row in something_to_loop
     output.close()
 
+
     output_files = {
         'extract_warning': 'ECMExtract.' + party_load_name + '.warning.csv',
         'extract_error': 'ECMExtract.' + party_load_name + '.error.csv',
         'extract_collapsed': 'ECMExtract.' + party_load_name + '.collapsed.csv',
-        'extract_change': 'ECMExtract.' + party_load_name + '.chg.csv',
         'extract_group_rpa': 'ECMExtract.' + party_load_name + '.RPAgroup.csv',
         'extract_momo_rpa': 'ECMExtract.' + party_load_name + '.RPAmomo.csv',
         'party_load': 'PARTY.' + party_load_name + '.load.csv',
         'party_error': 'PARTY.' + party_load_name + '.error.csv',
         'party_warning': 'PARTY.' + party_load_name + '.warning.csv'
     }
+    regular_or_urgent_file = get_regular_or_urgent(extract_input_file)
+    if regular_or_urgent_file=='regular':
+        output_files['extract_change']='ECMExtract.' + party_load_name + '.chg.csv'
     return output_files
 
 if __name__ == '__main__':
