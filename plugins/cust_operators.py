@@ -173,6 +173,9 @@ class FTPGetFileSensor(BaseSensorOperator):
         local_est_tz = pendulum.timezone("America/Toronto")
         now = pendulum.now()
         execution_date = context.get('execution_date')
+        next_execution_date = context.get('next_execution_date')
+        self.log.info("next Execution date is: (%s)", next_execution_date)
+        execution_date = next_execution_date
         if execution_date > now: 
             execution_date = now
         execution_date_est = local_est_tz.convert(execution_date)
