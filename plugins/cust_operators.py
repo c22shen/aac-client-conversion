@@ -12,6 +12,24 @@ from coseco2cifpython import python_execute
 
 log = logging.getLogger(__name__)
 
+class MyFirstOperator(BaseOperator):
+
+    @apply_defaults
+    def __init__(self, *args, **kwargs):
+        super(MyFirstOperator, self).__init__(*args, **kwargs)
+
+    def execute(self, context):
+        local_est_tz = pendulum.timezone("America/Toronto")
+        execution_date = context.get('execution_date')
+        execution_date_est = local_est_tz.convert(execution_date)
+        now = pendulum.now()
+        log.info("execution_date %s", execution_date)
+        log.info('execution_date_est: %s', execution_date_est)
+        log.info('now: %s', now)
+        in_the_future = execution_date > now
+        log.info('in_the_future: %s', in_the_future)
+
+
 class SFTPUploadOperator(BaseOperator):
 
     @apply_defaults
@@ -164,4 +182,4 @@ def _construct_input_file_name(file_urgency_level, file_type, currentExecutionDa
 
 class CustomPlugins(AirflowPlugin):
     name = "custom_plugin"
-    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator]
+    operators = [SFTPUploadOperator, MyFirstSensor, FTPGetFileSensor, ClientConversionOperator, MyFirstOperator]
